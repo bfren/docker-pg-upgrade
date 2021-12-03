@@ -101,7 +101,7 @@ bf-done
 
 NEW_DATA="/data${NEW_VERSION}"
 bf-echo "Initialising new cluster in ${NEW_DATA}..." "upgrade"
-mkdir ${NEW_VERSION} && bf-ch -o postgres ${NEW_DATA}
+mkdir ${NEW_DATA} && bf-ch -o postgres ${NEW_DATA}
 su - postgres -c "${NEW_BIN}/initdb -D ${NEW_DATA}"
 bf-done
 
