@@ -34,6 +34,7 @@ shift $(($OPTIND -1))
 case "${MODE-}" in
     "0"|"") MODE=0 && bf-echo "Dry run mode enabled." "upgrade" ;;
     "1") bf-echo "Live mode enabled." "upgrade" ;;
+    "") bf-error "Mode is required." "upgrade" && usage ;;
     *) bf-error "Unknown mode: ${MODE-}." "upgrade" && usage ;;
 esac
 
@@ -44,6 +45,7 @@ esac
 
 case "${VERSION-}" in
     "13"|"14") bf-debug "Upgrade to PostgreSQL v${VERSION} is supported." "upgrade" ;;
+    "") bf-error "Version is required." "upgrade" && usage ;;
     *) bf-error "Upgrade to PostgreSQL v${VERSION} is not supported." "upgrade" ;;
 esac
 
@@ -65,25 +67,35 @@ exit 0
 
 
 #======================================================================================================================
-# Perform a backup if on live mode.
+# Install the data version.
 #======================================================================================================================
 
-[[ "${MODE}" = "1" ]] && db-backup
+bf-echo "Installing PostgreSQL v${DATA_VERSION}..." "upgrade"
+
+apk add --no-cache \
+    postgresql${DATA_VERSION}
+
+OLD_BIN="/usr/libexec/postgresql${DATA_VERSION}"
+bf-debug "PostgreSQL v${DATA_VERSION} executables installed in ${OLD_BIN}." "upgrade"
+
+bf-done
 
 
 #======================================================================================================================
 # Install the upgrade version.
 #======================================================================================================================
 
-bf-echo "Installing PostgreSQL ${VERSION}..." "upgrade"
+bf-echo "Installing PostgreSQL v${VERSION}..." "upgrade"
 
 apk add --no-cache \
     postgresql${VERSION}
 
-BIN="/usr/libexec/postgresql${VERSION}"
-bf-debug "PostgreSQL ${VERSION} executables installed in ${BIN}." "upgrade"
+NEW_BIN="/usr/libexec/postgresql${VERSION}"
+bf-debug "PostgreSQL v${VERSION} executables installed in ${NEW_BIN}." "upgrade"
 
 bf-done
+
+exit 0
 
 
 #======================================================================================================================
