@@ -9,5 +9,4 @@ RUN bf-install
 
 VOLUME [ "/data" ]
 
-USER postgres
 ENTRYPOINT [ "/upgrade" ]
