@@ -8,7 +8,7 @@ set -euo pipefail
 #======================================================================================================================
 
 usage () {
-    echo "Usage: `basename ${0}` -v VERSION [-m]" 2>&1
+    echo "Usage: `basename ${0}` -v NEW_VERSION [-m]" 2>&1
     echo "    -m    Mode: 0 = dry run (default), 1 = live."
     echo "    -v    Version to upgrade server to (required)."
     echo "    -h    Show this usage message."
@@ -19,7 +19,7 @@ while getopts ":hv:m:" C ; do
     case ${C} in
         h) usage ;;
         m) MODE="${OPTARG}" ;;
-        v) VERSION="${OPTARG}" ;;
+        v) NEW_VERSION="${OPTARG}" ;;
         ?) bf-notok "Invalid option: -${OPTARG}" "upgrade" && usage ;;
     esac
 done
@@ -43,10 +43,10 @@ esac
 # Ensure version is valid.
 #======================================================================================================================
 
-case "${VERSION-}" in
-    "13"|"14") bf-debug "Upgrade to PostgreSQL v${VERSION} is supported." "upgrade" ;;
+case "${NEW_VERSION-}" in
+    "13"|"14") bf-debug "Upgrade to PostgreSQL v${NEW_VERSION} is supported." "upgrade" ;;
     "") bf-notok "Version is required." "upgrade" && usage ;;
-    *) bf-error "Upgrade to PostgreSQL v${VERSION} is not supported." "upgrade" ;;
+    *) bf-error "Upgrade to PostgreSQL v${NEW_VERSION} is not supported." "upgrade" ;;
 esac
 
 
@@ -55,29 +55,27 @@ esac
 #======================================================================================================================
 
 DATA=/data
-DATA_VERSION=`cat ${DATA}/PG_VERSION`
-bf-debug "Data version: PostgreSQL v${DATA_VERSION}." "upgrade"
+OLD_VERSION=`cat ${DATA}/PG_VERSION`
+bf-debug "Data version: PostgreSQL v${OLD_VERSION}." "upgrade"
 
-if [ "${DATA_VERSION}" -lt "${VERSION}" ] ; then
-    bf-echo "Upgrading from PostgreSQL v${DATA_VERSION} to v${VERSION}." "upgrade"
+if [ "${OLD_VERSION}" -lt "${NEW_VERSION}" ] ; then
+    bf-echo "Upgrading from PostgreSQL v${OLD_VERSION} to v${NEW_VERSION}." "upgrade"
 else
-    bf-error "Unable to upgrade from PostgreSQL v${DATA_VERSION} to v${VERSION}." "upgrade"
+    bf-error "Unable to upgrade from PostgreSQL v${OLD_VERSION} to v${NEW_VERSION}." "upgrade"
 fi
-
-exit 0
 
 
 #======================================================================================================================
 # Install the data version.
 #======================================================================================================================
 
-bf-echo "Installing PostgreSQL v${DATA_VERSION}..." "upgrade"
+bf-echo "Installing PostgreSQL v${OLD_VERSION}..." "upgrade"
 
 apk add --no-cache \
-    postgresql${DATA_VERSION}
+    postgresql${OLD_VERSION}
 
-OLD_BIN="/usr/libexec/postgresql${DATA_VERSION}"
-bf-debug "PostgreSQL v${DATA_VERSION} executables installed in ${OLD_BIN}." "upgrade"
+OLD_BIN="/usr/libexec/postgresql${OLD_VERSION}"
+bf-debug "PostgreSQL v${OLD_VERSION} executables installed in ${OLD_BIN}." "upgrade"
 
 bf-done
 
@@ -86,17 +84,15 @@ bf-done
 # Install the upgrade version.
 #======================================================================================================================
 
-bf-echo "Installing PostgreSQL v${VERSION}..." "upgrade"
+bf-echo "Installing PostgreSQL v${NEW_VERSION}..." "upgrade"
 
 apk add --no-cache \
-    postgresql${VERSION}
+    postgresql${NEW_VERSION}
 
-NEW_BIN="/usr/libexec/postgresql${VERSION}"
-bf-debug "PostgreSQL v${VERSION} executables installed in ${NEW_BIN}." "upgrade"
+NEW_BIN="/usr/libexec/postgresql${NEW_VERSION}"
+bf-debug "PostgreSQL v${NEW_VERSION} executables installed in ${NEW_BIN}." "upgrade"
 
 bf-done
-
-exit 0
 
 
 #======================================================================================================================
@@ -113,25 +109,16 @@ bf-done
 
 
 #======================================================================================================================
-# Stop the current server.
-#======================================================================================================================
-
-bf-echo "Stopping current server..." "upgrade"
-s6-setuidgid postgres pg_ctl stop -D "${POSTGRESQL_DATA}"
-bf-done
-
-
-#======================================================================================================================
 # Run the upgrade.
 #======================================================================================================================
 
 if [ "${MODE}" = "0" ] ; then
 
     bf-echo "Upgrade dry run..." "upgrade"
-    time ${BIN}/pg_upgrade \
-        --old-bindir /usr/libexec/postgresql \
-        --new-bindir ${BIN} \
-        --old-datadir ${POSTGRESQL_DATA} \
+    time ${NEW_BIN}/pg_upgrade \
+        --old-bindir ${OLD_BIN} \
+        --new-bindir ${NEW_BIN} \
+        --old-datadir ${DATA} \
         --new-datadir ${NEW_DATA} \
         --clone \
         --check
@@ -140,10 +127,10 @@ if [ "${MODE}" = "0" ] ; then
 elif [ "${MODE}" = "1" ] ; then
 
     bf-echo "Upgrading..." "upgrade"
-    time ${BIN}/pg_upgrade \
-        --old-bindir /usr/libexec/postgresql \
-        --new-bindir ${BIN} \
-        --old-datadir ${POSTGRESQL_DATA} \
+    time ${NEW_BIN}/pg_upgrade \
+        --old-bindir ${OLD_BIN} \
+        --new-bindir ${NEW_BIN} \
+        --old-datadir ${DATA} \
         --new-datadir ${NEW_DATA} \
         --clone
     bf-done
@@ -155,18 +142,11 @@ fi
 # Move old data to subdirectory and new data into correct location.
 #======================================================================================================================
 
-OLD_DATA="${POSTGRESQL_DATA}/.old"
+OLD_DATA="${DATA}/.old"
 bf-echo "Moving old data to ${OLD_DATA}..."
-mkdir ${OLD_DATA} && mv ${POSTGRESQL_DATA}/* ${OLD_DATA}
+mkdir ${OLD_DATA} && mv ${DATA}/* ${OLD_DATA}
 bf-done
 
-bf-echo "Moving new data to ${POSTGRESQL_DATA}..."
-mv ${NEW_DATA}/* ${POSTGRESQL_DATA}
+bf-echo "Moving new data to ${DATA}..."
+mv ${NEW_DATA}/* ${DATA}
 bf-done
-
-
-#======================================================================================================================
-# Start the server.
-#======================================================================================================================
-
-
