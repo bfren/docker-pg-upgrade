@@ -54,10 +54,11 @@ esac
 # Ensure version is valid, and check against current version.
 #======================================================================================================================
 
-DATA_VERSION=`cat /data/PG_VERSION`
+DATA=/data
+DATA_VERSION=`cat ${DATA}/PG_VERSION`
 bf-debug "Data version: PostgreSQL v${DATA_VERSION}." "upgrade"
 
-if [ "${DATA_VERSION}" < "${VERSION}" ] ; then
+if [ "${DATA_VERSION}" -lt "${VERSION}" ] ; then
     bf-echo "Upgrading from PostgreSQL v${DATA_VERSION} to v${VERSION}." "upgrade"
 else
     bf-error "Unable to upgrade from PostgreSQL v${DATA_VERSION} to v${VERSION}." "upgrade"
