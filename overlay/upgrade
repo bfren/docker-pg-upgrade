@@ -112,7 +112,7 @@ bf-done
 COMMAND="pg_upgrade -b ${OLD_BIN} -B ${NEW_BIN} -d ${DATA} -D ${NEW_DATA} -U postgres"
 bf-debug "${COMMAND}" "upgrade"
 
-if [ "${MODE}" = "0" ] ; then
+if [ "${MODE}" = "check" ] ; then
 
     bf-echo "Upgrade dry run..." "upgrade"
     su - postgres -c "${COMMAND} --check"
@@ -120,24 +120,25 @@ if [ "${MODE}" = "0" ] ; then
 
     exit 0
 
-elif [ "${MODE}" = "1" ] ; then
+elif [ "${MODE}" = "live" ] ; then
 
     bf-echo "Upgrading..." "upgrade"
     su - postgres -c "${COMMAND}"
     bf-done
 
+    # move old data to subdirectory
+    OLD_DATA="${DATA}/.old"
+    bf-echo "Moving old data to ${OLD_DATA}..."
+    mkdir ${OLD_DATA} && mv ${DATA}/* ${OLD_DATA}
+    bf-done
+
+    # move new data into correct location
+    bf-echo "Moving new data to ${DATA}..."
+    mv ${NEW_DATA}/* ${DATA}
+    bf-done
+
+else
+
+    bf-error "Unknown mode."
+
 fi
-
-
-#======================================================================================================================
-# Move old data to subdirectory and new data into correct location.
-#======================================================================================================================
-
-OLD_DATA="${DATA}/.old"
-bf-echo "Moving old data to ${OLD_DATA}..."
-mkdir ${OLD_DATA} && mv ${DATA}/* ${OLD_DATA}
-bf-done
-
-bf-echo "Moving new data to ${DATA}..."
-mv ${NEW_DATA}/* ${DATA}
-bf-done
