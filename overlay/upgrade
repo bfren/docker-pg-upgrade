@@ -109,13 +109,13 @@ bf-done
 # Run the upgrade.
 #======================================================================================================================
 
-COMMAND="${NEW_BIN}/pg_upgrade -b ${OLD_BIN} -B ${NEW_BIN} -d ${DATA} -D ${NEW_DATA}"
+COMMAND="${NEW_BIN}/pg_upgrade -b ${OLD_BIN} -B ${NEW_BIN} -d ${DATA} -D ${NEW_DATA} -U postgres --clone"
 bf-debug "${COMMAND}" "upgrade"
 
 if [ "${MODE}" = "0" ] ; then
 
     bf-echo "Upgrade dry run..." "upgrade"
-    su postgres -c "${COMMAND} --check"
+    ${COMMAND} --check
     bf-done
 
     exit 0
@@ -123,7 +123,7 @@ if [ "${MODE}" = "0" ] ; then
 elif [ "${MODE}" = "1" ] ; then
 
     bf-echo "Upgrading..." "upgrade"
-    su postgres -c "${COMMAND}"
+    ${COMMAND}
     bf-done
 
 fi
