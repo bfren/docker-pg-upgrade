@@ -124,6 +124,8 @@ if [ "${MODE}" = "0" ] ; then
         --check
     bf-done
 
+    exit 0
+
 elif [ "${MODE}" = "1" ] ; then
 
     bf-echo "Upgrading..." "upgrade"
