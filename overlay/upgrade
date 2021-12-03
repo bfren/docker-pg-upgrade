@@ -99,9 +99,10 @@ bf-done
 # Create and initialise the new cluster.
 #======================================================================================================================
 
-NEW_DATA="/data-new"
+NEW_DATA="/data${NEW_VERSION}"
 bf-echo "Initialising new cluster in ${NEW_DATA}..." "upgrade"
-su postgres -c "${NEW_BIN}/initdb -D ${NEW_DATA}"
+mkdir ${NEW_VERSION} && bf-ch -o postgres ${NEW_DATA}
+su - postgres -c "${NEW_BIN}/initdb -D ${NEW_DATA}"
 bf-done
 
 
@@ -115,7 +116,7 @@ bf-debug "${COMMAND}" "upgrade"
 if [ "${MODE}" = "0" ] ; then
 
     bf-echo "Upgrade dry run..." "upgrade"
-    su postgres -c "${COMMAND} --check"
+    su - postgres -c "${COMMAND} --check"
     bf-done
 
     exit 0
@@ -123,7 +124,7 @@ if [ "${MODE}" = "0" ] ; then
 elif [ "${MODE}" = "1" ] ; then
 
     bf-echo "Upgrading..." "upgrade"
-    su postgres -c "${COMMAND}"
+    su - postgres -c "${COMMAND}"
     bf-done
 
 fi
