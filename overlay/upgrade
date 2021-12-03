@@ -137,6 +137,10 @@ elif [ "${MODE}" = "live" ] ; then
     mv ${NEW_DATA}/* ${DATA}
     bf-done
 
+    # copy config
+    cp -f ${OLD_DATA}/postgres.conf ${NEW_DATA}/
+    cp -f ${OLD_DATA}/ph_hba.conf ${NEW_DATA}/
+
 else
 
     bf-error "Unknown mode."
