@@ -66,21 +66,6 @@ fi
 
 
 #======================================================================================================================
-# Install the data version.
-#======================================================================================================================
-
-bf-echo "Installing PostgreSQL v${OLD_VERSION}..." "upgrade"
-
-apk add --no-cache \
-    postgresql${OLD_VERSION}
-
-OLD_BIN="/usr/libexec/postgresql${OLD_VERSION}"
-bf-debug "PostgreSQL v${OLD_VERSION} executables installed in ${OLD_BIN}." "upgrade"
-
-bf-done
-
-
-#======================================================================================================================
 # Install the upgrade version.
 #======================================================================================================================
 
@@ -91,6 +76,21 @@ apk add --no-cache \
 
 NEW_BIN="/usr/libexec/postgresql${NEW_VERSION}"
 bf-debug "PostgreSQL v${NEW_VERSION} executables installed in ${NEW_BIN}." "upgrade"
+
+bf-done
+
+
+#======================================================================================================================
+# Install the data version.
+#======================================================================================================================
+
+bf-echo "Installing PostgreSQL v${OLD_VERSION}..." "upgrade"
+
+apk add --no-cache \
+    postgresql${OLD_VERSION}
+
+OLD_BIN="/usr/libexec/postgresql${OLD_VERSION}"
+bf-debug "PostgreSQL v${OLD_VERSION} executables installed in ${OLD_BIN}." "upgrade"
 
 bf-done
 
