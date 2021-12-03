@@ -75,7 +75,7 @@ apk add --no-cache \
     postgresql${NEW_VERSION}
 
 NEW_BIN="/usr/libexec/postgresql${NEW_VERSION}"
-bf-debug "PostgreSQL v${NEW_VERSION} executables installed in ${NEW_BIN}." "upgrade"
+bf-debug "PostgreSQL v${NEW_VERSION} installed into ${NEW_BIN}." "upgrade"
 
 bf-done
 
@@ -90,7 +90,7 @@ apk add --no-cache \
     postgresql${OLD_VERSION}
 
 OLD_BIN="/usr/libexec/postgresql${OLD_VERSION}"
-bf-debug "PostgreSQL v${OLD_VERSION} executables installed in ${OLD_BIN}." "upgrade"
+bf-debug "PostgreSQL v${OLD_VERSION} installed into ${OLD_BIN}." "upgrade"
 
 bf-done
 
@@ -102,7 +102,7 @@ bf-done
 NEW_DATA="/data${NEW_VERSION}"
 bf-echo "Initialising new cluster in ${NEW_DATA}..." "upgrade"
 mkdir ${NEW_DATA} && bf-ch -o postgres ${NEW_DATA}
-su - postgres -c "${NEW_BIN}/initdb -D ${NEW_DATA}"
+su - postgres -c "initdb -D ${NEW_DATA}"
 bf-done
 
 
@@ -110,7 +110,7 @@ bf-done
 # Run the upgrade.
 #======================================================================================================================
 
-COMMAND="${NEW_BIN}/pg_upgrade -b ${OLD_BIN} -B ${NEW_BIN} -d ${DATA} -D ${NEW_DATA} -U postgres"
+COMMAND="pg_upgrade -b ${OLD_BIN} -B ${NEW_BIN} -d ${DATA} -D ${NEW_DATA} -U postgres"
 bf-debug "${COMMAND}" "upgrade"
 
 if [ "${MODE}" = "0" ] ; then
