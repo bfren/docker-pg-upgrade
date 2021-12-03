@@ -99,11 +99,11 @@ bf-done
 # Create and initialise the new cluster.
 #======================================================================================================================
 
-NEW_DATA="/upgrade"
+NEW_DATA="/data${NEW_VERSION}"
 bf-echo "Initialising new cluster in ${NEW_DATA}..." "upgrade"
 
 mkdir ${NEW_DATA} && bf-ch -o postgres:postgres ${NEW_DATA}
-s6-setuidgid postgres $BIN/initdb -D ${NEW_DATA}
+s6-setuidgid postgres ${NEW_BIN}/initdb -D ${NEW_DATA}
 
 bf-done
 
