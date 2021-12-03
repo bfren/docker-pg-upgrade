@@ -112,16 +112,12 @@ bf-done
 # Run the upgrade.
 #======================================================================================================================
 
+COMMAND="${NEW_BIN}/pg_upgrade --b ${OLD_BIN} --B ${NEW_BIN} --d ${DATA} --D ${NEW_DATA} --clone"
+
 if [ "${MODE}" = "0" ] ; then
 
     bf-echo "Upgrade dry run..." "upgrade"
-    time ${NEW_BIN}/pg_upgrade \
-        --old-bindir ${OLD_BIN} \
-        --new-bindir ${NEW_BIN} \
-        --old-datadir ${DATA} \
-        --new-datadir ${NEW_DATA} \
-        --clone \
-        --check
+    su postgres -c "time ${COMMAND} --check"
     bf-done
 
     exit 0
@@ -129,12 +125,7 @@ if [ "${MODE}" = "0" ] ; then
 elif [ "${MODE}" = "1" ] ; then
 
     bf-echo "Upgrading..." "upgrade"
-    time ${NEW_BIN}/pg_upgrade \
-        --old-bindir ${OLD_BIN} \
-        --new-bindir ${NEW_BIN} \
-        --old-datadir ${DATA} \
-        --new-datadir ${NEW_DATA} \
-        --clone
+    su postgres -c "time ${COMMAND}"
     bf-done
 
 fi
