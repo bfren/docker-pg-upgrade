@@ -1,0 +1,149 @@
+#!/usr/bin/with-contenv sh
+
+set -euo pipefail
+
+
+#======================================================================================================================
+# Executable usage.
+#======================================================================================================================
+
+usage () {
+    echo "Usage: `basename ${0}` -v VERSION [-m]" 2>&1
+    echo "    -m    Mode: 0 = dry run (default), 1 = live."
+    echo "    -v    Version to upgrade server to (required)."
+    echo "    -h    Show this usage message."
+    exit 2
+}
+
+while getopts ":hv:m:" C ; do
+    case ${C} in
+        h) usage ;;
+        m) MODE="${OPTARG}" ;;
+        v) VERSION="${OPTARG}" ;;
+        ?) bf-notok "Invalid option: -${OPTARG}" "upgrade" && usage ;;
+    esac
+done
+
+shift $(($OPTIND -1))
+
+
+#======================================================================================================================
+# Ensure mode is valid.
+#======================================================================================================================
+
+case "${MODE-}" in
+    "0") bf-echo "Dry run mode enabled." "update" ;;
+    "1") bf-echo "Live mode enabled." "update" ;;
+    *) bf-error "Unknown mode: ${MODE-}." "update" && usage ;;
+esac
+
+
+#======================================================================================================================
+# Ensure version is valid, and check against current version.
+#======================================================================================================================
+
+CURRENT_VERSION=`cat /usr/libexec/postgresql13/PG_VERSION`
+[[ "${CURRENT_VERSION}" = "${VERSION-}" ]] && bf-error "PostgreSQL is already on version ${CURRENT_VERSION}." "upgrade"
+
+case "${VERSION-}" in
+    "13") bf-echo "Upgrading to PostgreSQL 13." "upgrade" ;;
+    "14") bf-echo "Upgrading to PostgreSQL 14." "upgrade" ;;
+    *) bf-error "Unsupported version: ${VERSION-}." "update" && usage ;;
+esac
+
+exit 0
+
+
+#======================================================================================================================
+# Perform a backup if on live mode.
+#======================================================================================================================
+
+[[ "${MODE}" = "1" ]] && db-backup
+
+
+#======================================================================================================================
+# Install the upgrade version.
+#======================================================================================================================
+
+bf-echo "Installing PostgreSQL ${VERSION}..." "upgrade"
+
+apk add --no-cache \
+    postgresql${VERSION}
+
+BIN="/usr/libexec/postgresql${VERSION}"
+bf-debug "PostgreSQL ${VERSION} executables installed in ${BIN}." "upgrade"
+
+bf-done
+
+
+#======================================================================================================================
+# Create and initialise the new cluster.
+#======================================================================================================================
+
+NEW_DATA="/upgrade"
+bf-echo "Initialising new cluster in ${NEW_DATA}..." "upgrade"
+
+mkdir ${NEW_DATA} && bf-ch -o postgres:postgres ${NEW_DATA}
+s6-setuidgid postgres $BIN/initdb -D ${NEW_DATA}
+
+bf-done
+
+
+#======================================================================================================================
+# Stop the current server.
+#======================================================================================================================
+
+bf-echo "Stopping current server..." "upgrade"
+s6-setuidgid postgres pg_ctl stop -D "${POSTGRESQL_DATA}"
+bf-done
+
+
+#======================================================================================================================
+# Run the upgrade.
+#======================================================================================================================
+
+if [ "${MODE}" = "0" ] ; then
+
+    bf-echo "Upgrade dry run..." "upgrade"
+    time ${BIN}/pg_upgrade \
+        --old-bindir /usr/libexec/postgresql \
+        --new-bindir ${BIN} \
+        --old-datadir ${POSTGRESQL_DATA} \
+        --new-datadir ${NEW_DATA} \
+        --clone \
+        --check
+    bf-done
+
+elif [ "${MODE}" = "1" ] ; then
+
+    bf-echo "Upgrading..." "upgrade"
+    time ${BIN}/pg_upgrade \
+        --old-bindir /usr/libexec/postgresql \
+        --new-bindir ${BIN} \
+        --old-datadir ${POSTGRESQL_DATA} \
+        --new-datadir ${NEW_DATA} \
+        --clone
+    bf-done
+
+fi
+
+
+#======================================================================================================================
+# Move old data to subdirectory and new data into correct location.
+#======================================================================================================================
+
+OLD_DATA="${POSTGRESQL_DATA}/.old"
+bf-echo "Moving old data to ${OLD_DATA}..."
+mkdir ${OLD_DATA} && mv ${POSTGRESQL_DATA}/* ${OLD_DATA}
+bf-done
+
+bf-echo "Moving new data to ${POSTGRESQL_DATA}..."
+mv ${NEW_DATA}/* ${POSTGRESQL_DATA}
+bf-done
+
+
+#======================================================================================================================
+# Start the server.
+#======================================================================================================================
+
+
