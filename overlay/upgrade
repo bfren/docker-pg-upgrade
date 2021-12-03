@@ -32,7 +32,7 @@ shift $(($OPTIND -1))
 #======================================================================================================================
 
 case "${MODE-}" in
-    "check"|"") MODE=0 && bf-echo "Dry run mode enabled." "upgrade" ;;
+    "check"|"") MODE="check" && bf-echo "Check mode enabled." "upgrade" ;;
     "live") bf-echo "Live mode enabled." "upgrade" ;;
     *) bf-notok "Unknown mode: ${MODE-}." "upgrade" && usage ;;
 esac
@@ -114,7 +114,7 @@ bf-debug "${COMMAND}" "upgrade"
 
 if [ "${MODE}" = "check" ] ; then
 
-    bf-echo "Upgrade dry run..." "upgrade"
+    bf-echo "Upgrade check..." "upgrade"
     su - postgres -c "${COMMAND} --check"
     bf-done
 
