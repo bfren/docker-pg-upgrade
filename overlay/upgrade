@@ -9,7 +9,7 @@ set -euo pipefail
 
 usage () {
     echo "Usage: `basename ${0}` -v NEW_VERSION [-m]" 2>&1
-    echo "    -m    Mode: 0 = dry run (default), 1 = live."
+    echo "    -m    Mode: 'check' (default) or 'live' - you are strongly recommended to run in 'check' mode first."
     echo "    -v    Version to upgrade server to (required)."
     echo "    -h    Show this usage message."
     exit 2
@@ -32,9 +32,8 @@ shift $(($OPTIND -1))
 #======================================================================================================================
 
 case "${MODE-}" in
-    "0"|"") MODE=0 && bf-echo "Dry run mode enabled." "upgrade" ;;
-    "1") bf-echo "Live mode enabled." "upgrade" ;;
-    "") bf-notok "Mode is required." "upgrade" && usage ;;
+    "check"|"") MODE=0 && bf-echo "Dry run mode enabled." "upgrade" ;;
+    "live") bf-echo "Live mode enabled." "upgrade" ;;
     *) bf-notok "Unknown mode: ${MODE-}." "upgrade" && usage ;;
 esac
 
