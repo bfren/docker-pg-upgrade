@@ -109,7 +109,7 @@ bf-done
 # Run the upgrade.
 #======================================================================================================================
 
-COMMAND="${NEW_BIN}/pg_upgrade -b ${OLD_BIN} -B ${NEW_BIN} -d ${DATA} -D ${NEW_DATA} --clone"
+COMMAND="${NEW_BIN}/pg_upgrade -b ${OLD_BIN} -B ${NEW_BIN} -d ${DATA} -D ${NEW_DATA}"
 bf-debug "${COMMAND}" "upgrade"
 
 if [ "${MODE}" = "0" ] ; then
