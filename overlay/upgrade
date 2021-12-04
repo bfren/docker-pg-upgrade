@@ -138,8 +138,10 @@ elif [ "${MODE}" = "live" ] ; then
     bf-done
 
     # copy config
-    cp -f ${OLD_DATA}/postgresql.conf ${NEW_DATA}/
-    cp -f ${OLD_DATA}/pg_hba.conf ${NEW_DATA}/
+    bf-echo "Copying configuration from ${OLD_DATA} to ${DATA}..."
+    cp ${OLD_DATA}/postgresql.conf ${DATA}/
+    cp ${OLD_DATA}/pg_hba.conf ${DATA}/
+    bf-done
 
 else
 
