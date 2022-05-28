@@ -1,6 +1,6 @@
 # Docker PostgreSQL Upgrade
 
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/bfren/docker-pg-upgrade) ![Docker Pulls](https://img.shields.io/docker/pulls/bfren/pg-upgrade?label=pulls) ![Docker Image Size (tag)](https://img.shields.io/docker/image-size/bfren/pg-upgrade/latest?label=size)<br/>
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/bfren/docker-pg-upgrade) ![Docker Pulls](https://img.shields.io/endpoint?url=https%3A%2F%2Fbfren.dev%2Fdocker%2Fpulls%2Fpg-upgrade) ![Docker Image Size](https://img.shields.io/endpoint?url=https%3A%2F%2Fbfren.dev%2Fdocker%2Fsize%2Fpg-upgrade)<br/>
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/bfren/docker-pg-upgrade/dev?label=build)
 
 [Docker Repository](https://hub.docker.com/r/bfren/pg-upgrade) - [bfren ecosystem](https://github.com/bfren/docker)
