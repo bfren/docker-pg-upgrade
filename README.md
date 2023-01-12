@@ -33,4 +33,4 @@ docker run -v /path/to/data:/data bfren/pg-upgrade -v 14 -m live
 
 ## Copyright
 
-> Copyright (c) 2021-2022 [bfren](https://bfren.dev) (unless otherwise stated)
+> Copyright (c) 2021-2023 [bfren](https://bfren.dev) (unless otherwise stated)
