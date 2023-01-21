@@ -61,8 +61,6 @@ jobs:
           tags: |
             bfren/pg-upgrade:dev
             bfren/pg-upgrade:${{ steps.version.outputs.contents }}-beta
-            ghcr.io/bfren/pg-upgrade:dev
-            ghcr.io/bfren/pg-upgrade:${{ steps.version.outputs.contents }}-beta
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
