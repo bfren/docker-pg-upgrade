@@ -68,10 +68,6 @@ jobs:
             bfren/pg-upgrade:${{ steps.version_major.outputs.contents }}
             bfren/pg-upgrade:${{ steps.version_minor.outputs.contents }}
             bfren/pg-upgrade:${{ steps.version.outputs.contents }}
-            ghcr.io/bfren/pg-upgrade:latest
-            ghcr.io/bfren/pg-upgrade:${{ steps.version_major.outputs.contents }}
-            ghcr.io/bfren/pg-upgrade:${{ steps.version_minor.outputs.contents }}
-            ghcr.io/bfren/pg-upgrade:${{ steps.version.outputs.contents }}
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
