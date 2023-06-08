@@ -126,9 +126,13 @@ elif [ "${MODE}" = "live" ] ; then
     su - postgres -c "${COMMAND}"
     bf-done
 
-    # move old data to subdirectory
+    # delete .old directory if it already exists
     OLD_DATA="${DATA}/.old"
-    bf-echo "Moving old data to ${OLD_DATA}..."
+    bf-echo "Deleting ${OLD_DATA}..."
+    rm -rf ${OLD_DATA}
+
+    # move old data to subdirectory
+    bf-echo "Moving current data to ${OLD_DATA}..."
     mkdir ${OLD_DATA} && mv ${DATA}/* ${OLD_DATA}
     bf-done
 
