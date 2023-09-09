@@ -43,7 +43,7 @@ esac
 #======================================================================================================================
 
 case "${NEW_VERSION-}" in
-    "13"|"14"|"15") bf-debug "Upgrade to PostgreSQL v${NEW_VERSION} is supported." "upgrade" ;;
+    "12" | "13"|"14"|"15") bf-debug "Upgrade to PostgreSQL v${NEW_VERSION} is supported." "upgrade" ;;
     "") bf-notok "Version is required." "upgrade" && usage ;;
     *) bf-error "Upgrade to PostgreSQL v${NEW_VERSION} is not supported." "upgrade" ;;
 esac
