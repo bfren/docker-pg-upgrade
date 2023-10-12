@@ -19,14 +19,12 @@ adduser --uid 1000 --disabled-password --ingroup postgres postgres
 
 bf-echo "Installing PostgreSQL dependencies..."
 apk --no-cache add \
-    busybox \
     icu-libs \
     libcrypto1.1 \
     libldap \
     libpq \
     libssl1.1 \
     libxml2 \
-    musl \
     postgresql-common \
     tzdata
 
