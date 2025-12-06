@@ -1,4 +1,4 @@
-FROM bfren/alpine:alpine3.18-1.8.7
+FROM bfren/alpine:alpine3.23-3.1.0
 
 LABEL org.opencontainers.image.source="https://github.com/bfren/docker-pg-upgrade"
 
