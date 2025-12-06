@@ -1,37 +1,28 @@
-#!/bin/sh
+#!/usr/bin/nu
 
-set -euo pipefail
-export BF_E=`basename ${0}`
+use bf
 
+# Setup and install dependencies
+def main [] {
+    # add postgres user
+    bf user add postgres
 
-#======================================================================================================================
-# Add postgres user.
-#======================================================================================================================
+    # install basic PostgreSQL dependencies
+    bf write "Installing PostgreSQL dependencies."
+    bf pkg install [
+        "icu-libs"
+        "libcrypto3"
+        "libldap"
+        "lz4-libs"
+        "libpq"
+        "libssl3"
+        "libxml2"
+        "postgresql-common"
+        "tzdata"
+        "zlib"
+        "zstd-libs"
+    ]
 
-bf-echo "Adding user 'postgres'..."
-addgroup --gid 1000 postgres
-adduser --uid 1000 --disabled-password --ingroup postgres postgres
-
-
-#======================================================================================================================
-# Add postgres dependencies.
-#======================================================================================================================
-
-bf-echo "Installing PostgreSQL dependencies..."
-apk --no-cache add \
-    icu-libs \
-    libcrypto1.1 \
-    libldap \
-    libpq \
-    libssl1.1 \
-    libxml2 \
-    postgresql-common \
-    tzdata
-
-
-#======================================================================================================================
-# Make upgrade script executable.
-#======================================================================================================================
-
-bf-echo "Make upgrade script executable..."
-chmod +x /upgrade
+    # making upgrade script executable
+    ^chmod +x /upgrade
+}
